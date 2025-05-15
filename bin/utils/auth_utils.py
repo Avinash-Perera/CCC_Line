@@ -111,6 +111,25 @@ async def check_user_role(
     return current_user
 
 
+def verify_token(token):
+    try:
+        payload_data = jwt.decode(
+            token.credentials,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            options={"verify_exp": True}
+        )
+
+        print(payload_data)
+        return payload_data
+
+    except jwt.ExpiredSignatureError:
+        raise ValueError("Token expired")
+    except JWTError:
+        raise ValueError("Invalid token")
+
+
+
 # Role-specific dependency shortcuts
 async def get_admin_user(current_user: User = Depends(get_current_active_user)):
     """Verify user has admin role."""

@@ -82,3 +82,39 @@ class EmailService:
         except Exception as e:
             print(f"Failed to send confirmation email: {str(e)}")
             return False
+
+    @staticmethod
+    def send_password_reset_mail(email: str, otp_code: str):
+            try:
+                # Create message container
+                msg = MIMEMultipart()
+                msg['From'] = settings.SMTP_SENDER_MAIL
+                msg['To'] = email
+                msg['Subject'] = "Password Reset Request"
+
+                # Email body
+                body = f"""
+                            <html>
+                                <body>
+                                    <h2>Password Reset</h2>
+                                    <p>Your OTP for password reset is: <strong>{otp_code}</strong></p>
+                                    <p>This OTP is valid for 15 minutes.</p>
+                                    <p>If you didn't request this, please ignore this email.</p>
+                                </body>
+                            </html>
+                            """
+
+                msg.attach(MIMEText(body, 'html'))
+
+                # Send email
+                with smtplib.SMTP_SSL(
+                        host=settings.SMTP_HOST,
+                        port=settings.SMTP_PORT
+                ) as server:
+                    server.login(settings.SMTP_SENDER_MAIL, settings.SMTP_SENDER_PW)
+                    server.send_message(msg)
+
+                return True
+            except Exception as e:
+                print(f"Failed to send confirmation email: {str(e)}")
+                return False

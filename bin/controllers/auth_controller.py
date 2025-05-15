@@ -1,12 +1,10 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
 
 from bin.models.pg_user_model import User
 from bin.requests.user_requests.user_create import UserCreate
 from bin.requests.user_requests.user_login import UserLogin
 from bin.requests.user_requests.user_reset_password_confirm import UserResetPasswordConfirm
 from bin.requests.user_requests.user_reset_password_request import UserResetPasswordRequest
-from bin.requests.user_verify_otp import UserVerifyOTP
 from bin.services.db_services.auth_service import AuthService
 
 
@@ -67,49 +65,8 @@ class AuthController:
     def read_users_me(self, current_user: User):
         return current_user
 
-# router = APIRouter(tags=["Authentication"])
-#
-# def get_auth_controller(db: Session = Depends(db_connection)):
-#     return AuthController(db)
-#
-# @router.post("/register")
-# async def register(
-#     user_data: UserCreate,
-#     auth_controller: AuthController = Depends(get_auth_controller)
-# ):
-#     return await auth_controller.register(user_data)
-#
-# @router.post("/login")
-# async def login(
-#     form_data: OAuth2PasswordRequestForm = Depends(),
-#     auth_controller: AuthController = Depends(get_auth_controller)
-# ):
-#     return await auth_controller.login(form_data)
-#
-# @router.post("/activate-account")
-# async def activate_account(
-#     otp_data: UserVerifyOTP,
-#     auth_controller: AuthController = Depends(get_auth_controller)
-# ):
-#     return await auth_controller.activate_account(otp_data)
-#
-# @router.post("/request-password-reset")
-# async def request_password_reset(
-#     reset_request: UserResetPasswordRequest,
-#     auth_controller: AuthController = Depends(get_auth_controller)
-# ):
-#     return await auth_controller.request_password_reset(reset_request)
-#
-# @router.post("/reset-password")
-# async def reset_password(
-#     reset_data: UserResetPasswordConfirm,
-#     auth_controller: AuthController = Depends(get_auth_controller)
-# ):
-#     return await auth_controller.reset_password(reset_data)
-#
-# @router.get("/me")
-# async def read_users_me(
-#     current_user: User = Depends(get_current_active_user),
-#     auth_controller: AuthController = Depends(get_auth_controller)
-# ):
-#     return await auth_controller.read_users_me(current_user)
+    def generate_refresh_token(self, token):
+        try:
+            return self.auth_service.generate_refresh_token(token)
+        except Exception as e:
+          print(e)

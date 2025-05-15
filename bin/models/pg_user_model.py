@@ -44,7 +44,7 @@ class User(Base):
     first_name = Column(String(100))
     last_name = Column(String(100))
     email = Column(String(255), unique=True, index=True)
-    hashed_password = Column(String(255))
+    hashed_password = Column(String(255), nullable=True)  # Made nullable
     is_sri_lanka_citizen = Column(Boolean, default=False)
     is_backend_user = Column(Boolean, default=False)
     user_status = Column(String(50), default="pending")  # pending, active, suspended, banned
@@ -52,6 +52,5 @@ class User(Base):
     email_verified = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
     roles = relationship("Role", secondary=user_roles, back_populates="users")
     otps = relationship("OTP", back_populates="user")

@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends
-from requests import Session
+from fastapi.security import HTTPBearer
 from starlette import status
 
 from bin.controllers.auth_controller import AuthController
-from bin.controllers.donation_controller import donationManager
-from bin.db.postgresDB import db_connection
 from bin.requests.user_requests.user_create import UserCreate
 from bin.requests.user_requests.user_login import UserLogin
 
@@ -28,6 +26,11 @@ def verify_otp_and_activate_account(otp_code: str,
 def login( login_request: UserLogin,
           auth_controller: AuthController = Depends(AuthController)):
     return auth_controller.login(login_request)
+
+@auth_router.get('/refresh-token')
+async def refresh_token(token: str = Depends(HTTPBearer(bearerFormat='token')),
+                        auth_controller: AuthController = Depends(AuthController)):
+    return auth_controller.generate_refresh_token(token=token)
 
 
 
