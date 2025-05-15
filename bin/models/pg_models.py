@@ -1,6 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Numeric, func
-from sqlalchemy import String, Integer, Float, Sequence, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, func, JSON, ForeignKey, Numeric
+from sqlalchemy import String, Integer, Float, DateTime, Boolean, Text
 
 from bin.db.postgresDB import Base
 
@@ -18,6 +17,7 @@ class DonationTable(Base):
     amount = Column(Float, nullable=False)
     donation_id = Column(Integer,nullable=False)
     created_at = Column(DateTime, default=func.now())
+    payment_done_at = Column(DateTime, nullable=True)
 
 
 class CurrencyTable(Base):
@@ -51,6 +51,34 @@ class RiderDonation(Base):
 
     rider_id = Column(Integer, primary_key=True)
     donation_id = Column(Integer, primary_key=True)
+
+class ApiLog(Base):
+    __tablename__ = "api_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    request_url = Column(String, nullable=False)
+    request_method = Column(String, nullable=False)
+    request_headers = Column(JSON, nullable=True)
+    request_payload = Column(JSON, nullable=True)
+    response_status = Column(Integer, nullable=True)
+    response_headers = Column(JSON, nullable=True)
+    response_body = Column(JSON, nullable=True)
+    error = Column(Text, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class Transaction(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True)
+    donation_id = Column(Integer, ForeignKey('donation.record_id'))
+    mpgs_order_id = Column(String, unique=True)
+    session_id = Column(String)
+    success_indicator = Column(String)
+    status = Column(String, default="initiated")
+    amount = Column(Numeric(10, 2))
+    currency = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
 
 
